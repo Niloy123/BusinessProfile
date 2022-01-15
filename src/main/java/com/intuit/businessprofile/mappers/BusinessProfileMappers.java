@@ -69,6 +69,9 @@ public class BusinessProfileMappers {
 		if (updateBusinessProfileRequestDTO.getWebsite() != null) {
 			businessProfile.setWebsite(updateBusinessProfileRequestDTO.getWebsite());
 		}
+		if (updateBusinessProfileRequestDTO.getLegalName() != null) {
+			businessProfile.setLegalName(updateBusinessProfileRequestDTO.getLegalName());
+		}
 		if (updateBusinessProfileRequestDTO.getBusinessAddress() != null) {
 			if (updateBusinessProfileRequestDTO.getBusinessAddress().getCity() != null) {
 				businessProfile.getBusinessAddress()

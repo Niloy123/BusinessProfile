@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.intuit.businessprofile.dto.CreateBusinessProfileRequestDTO;
 import com.intuit.businessprofile.dto.UpdateBusinessProfileRequestDTO;
 import com.intuit.businessprofile.exceptions.RecordNotFoundException;
+import com.intuit.businessprofile.exceptions.ValidationException;
 import com.intuit.businessprofile.service.BusinessProfileService;
 
 @RestController
@@ -24,14 +25,14 @@ public class BusinessProfileController {
 
 	@PostMapping("/createprofile")
 	public String addProfile(@RequestBody @Valid CreateBusinessProfileRequestDTO createBusinessProfileRequestDTO)
-			throws RecordNotFoundException {
+			throws RecordNotFoundException, ValidationException {
 		businessProfileService.saveBusinessProfile(createBusinessProfileRequestDTO);
 		return "Added profile";
 	}
 
 	@PutMapping("/updateprofile")
 	public String updateProfile(@RequestBody @Valid UpdateBusinessProfileRequestDTO updateBusinessProfileRequestDTO)
-			throws RecordNotFoundException {
+			throws RecordNotFoundException, ValidationException {
 		businessProfileService.updateBusinessProfile(updateBusinessProfileRequestDTO);
 		return "Updated profile";
 	}

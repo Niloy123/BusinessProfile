@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -14,6 +16,7 @@ import com.intuit.businessprofile.dto.CreateBusinessProfileRequestDTO;
 import com.intuit.businessprofile.dto.UpdateBusinessProfileRequestDTO;
 import com.intuit.businessprofile.enums.Product;
 import com.intuit.businessprofile.exceptions.RecordNotFoundException;
+import com.intuit.businessprofile.exceptions.ValidationException;
 import com.intuit.businessprofile.mappers.BusinessProfileMappers;
 import com.intuit.businessprofile.model.BusinessProfile;
 import com.intuit.businessprofile.model.UserSubscription;
@@ -44,7 +47,7 @@ public class BusinessProfileServiceImpl implements BusinessProfileService {
 
 	@Override
 	public BusinessProfile saveBusinessProfile(CreateBusinessProfileRequestDTO createBusinessProfileRequestDTO)
-			throws RecordNotFoundException {
+			throws RecordNotFoundException, ValidationException {
 		// TODO Auto-generated method stub
 
 		Optional<UserSubscription> userSubscribedOptional = userSubscriptionRepository
@@ -53,9 +56,18 @@ public class BusinessProfileServiceImpl implements BusinessProfileService {
 			List<Product> productList = new ArrayList<>();
 			UserSubscription userSubscription = userSubscribedOptional.get();
 			addAvailableSubscriptions(userSubscription, productList);
-			for (Product product : productList) {
-				productClientMap.get(product).validateProduct(createBusinessProfileRequestDTO);
+			List<CompletableFuture<Boolean>> completableFutures = productList.stream()
+					.map(product -> validateCreateAsync(product, createBusinessProfileRequestDTO))
+					.collect(Collectors.toList());
+
+			List<Boolean> results = completableFutures.stream().map(CompletableFuture::join)
+					.collect(Collectors.toList());
+			if (results.contains(false)) {
+				throw new ValidationException("Validation failed");
 			}
+//			for (Product product : productList) {
+//				productClientMap.get(product).validateProduct(createBusinessProfileRequestDTO);
+//			}
 		} else {
 			throw new RecordNotFoundException("UserId passed is not found in the records");
 		}
@@ -81,7 +93,7 @@ public class BusinessProfileServiceImpl implements BusinessProfileService {
 
 	@Override
 	public BusinessProfile updateBusinessProfile(UpdateBusinessProfileRequestDTO updateBusinessProfileRequestDTO)
-			throws RecordNotFoundException {
+			throws RecordNotFoundException, ValidationException {
 		// TODO Auto-generated method stub
 		Optional<UserSubscription> userSubscribedOptional = userSubscriptionRepository
 				.findById(updateBusinessProfileRequestDTO.getUserId());
@@ -89,9 +101,18 @@ public class BusinessProfileServiceImpl implements BusinessProfileService {
 			List<Product> productList = new ArrayList<>();
 			UserSubscription userSubscription = userSubscribedOptional.get();
 			addAvailableSubscriptions(userSubscription, productList);
-			for (Product product : productList) {
-				productClientMap.get(product).validateProductForUpdate(updateBusinessProfileRequestDTO);
+			List<CompletableFuture<Boolean>> completableFutures = productList.stream()
+					.map(product -> validateUpdateAsync(product, updateBusinessProfileRequestDTO))
+					.collect(Collectors.toList());
+
+			List<Boolean> results = completableFutures.stream().map(CompletableFuture::join)
+					.collect(Collectors.toList());
+			if (results.contains(false)) {
+				throw new ValidationException("Validation failed");
 			}
+//			for (Product product : productList) {
+//				productClientMap.get(product).validateProductForUpdate(updateBusinessProfileRequestDTO);
+//			}
 		} else {
 			throw new RecordNotFoundException("UserId passed is not found in the records");
 		}
@@ -104,6 +125,22 @@ public class BusinessProfileServiceImpl implements BusinessProfileService {
 					updateBusinessProfileRequestDTO);
 		}
 		return businessProfileRepository.save(businessProfile);
+	}
+
+	private CompletableFuture<Boolean> validateUpdateAsync(Product product,
+			UpdateBusinessProfileRequestDTO updateBusinessProfileRequestDTO) {
+
+		CompletableFuture<Boolean> completableFuture = CompletableFuture.supplyAsync(
+				() -> productClientMap.get(product).validateProductForUpdate(updateBusinessProfileRequestDTO));
+		return completableFuture;
+	}
+
+	private CompletableFuture<Boolean> validateCreateAsync(Product product,
+			CreateBusinessProfileRequestDTO createBusinessProfileRequestDTO) {
+
+		CompletableFuture<Boolean> completableFuture = CompletableFuture
+				.supplyAsync(() -> productClientMap.get(product).validateProduct(createBusinessProfileRequestDTO));
+		return completableFuture;
 	}
 
 }

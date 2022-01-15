@@ -19,4 +19,12 @@ public class CustomExceptionHandler {
 		ErrorResponse error = new ErrorResponse("0001", errorMessage);
 		return new ResponseEntity(error, HttpStatus.NOT_FOUND);
 	}
+
+	@ExceptionHandler(ValidationException.class)
+	public final ResponseEntity<Object> handleValidationException(ValidationException ex, WebRequest request) {
+		List<String> errorMessage = new ArrayList<>();
+		errorMessage.add(ex.getLocalizedMessage());
+		ErrorResponse error = new ErrorResponse("0002", errorMessage);
+		return new ResponseEntity(error, HttpStatus.BAD_REQUEST);
+	}
 }

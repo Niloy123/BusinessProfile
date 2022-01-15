@@ -33,7 +33,7 @@ public class QBPaymentsClient implements ProductClient {
 		// TODO Auto-generated method stub
 		log.debug("Calling validate endpoint with request={} ", createBusinessProfileRequestDTO);
 		UriComponents uri = UriComponentsBuilder.fromUriString(Constants.VALIDATION_URL_BASE)
-				.path(Constants.VALIDATION_URL_PATH).build();
+				.path(Constants.VALIDATION_QB_PAYMENTS_URL_PATH).build();
 		HttpEntity<CreateBusinessProfileRequestDTO> requestEntity = new HttpEntity<>(createBusinessProfileRequestDTO);
 		ResponseEntity<DummyValidatorResponse> responseEntity = restTemplate.exchange(uri.toString(), HttpMethod.POST,
 				requestEntity, DummyValidatorResponse.class);
@@ -51,7 +51,7 @@ public class QBPaymentsClient implements ProductClient {
 		// TODO Auto-generated method stub
 		log.debug("Calling validate update endpoint with request={} ", updateBusinessProfileRequestDTO);
 		UriComponents uri = UriComponentsBuilder.fromUriString(Constants.VALIDATION_URL_BASE)
-				.path(Constants.VALIDATION_UPDATE_URL_PATH).build();
+				.path(Constants.VALIDATION_UPDATE_QB_PAYMENTS_URL_PATH).build();
 		HttpEntity<UpdateBusinessProfileRequestDTO> requestEntity = new HttpEntity<>(updateBusinessProfileRequestDTO);
 		ResponseEntity<DummyValidatorResponse> responseEntity = restTemplate.exchange(uri.toString(), HttpMethod.POST,
 				requestEntity, DummyValidatorResponse.class);
