@@ -15,6 +15,9 @@ import org.springframework.web.client.RestTemplate;
 import com.intuit.businessprofile.client.ProductClient;
 import com.intuit.businessprofile.enums.Product;
 
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
+
+@EnableSwagger2
 @Configuration
 @EnableMongoRepositories(basePackages = "com.intuit.businessprofile.repository")
 public class AutoConfig {
