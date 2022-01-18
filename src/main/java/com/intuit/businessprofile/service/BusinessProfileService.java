@@ -8,9 +8,9 @@ import com.intuit.businessprofile.model.BusinessProfile;
 
 public interface BusinessProfileService {
 
-	BusinessProfile saveBusinessProfile(CreateBusinessProfileRequestDTO createBusinessProfileRequestDTO)
-			throws RecordNotFoundException, ValidationException;
+	BusinessProfile saveBusinessProfile(CreateBusinessProfileRequestDTO createBusinessProfileRequestDTO, String userId)
+			throws Exception;
 
-	BusinessProfile updateBusinessProfile(UpdateBusinessProfileRequestDTO updateBusinessProfileRequestDTO)
-			throws RecordNotFoundException, ValidationException;
+	BusinessProfile updateBusinessProfile(UpdateBusinessProfileRequestDTO updateBusinessProfileRequestDTO,
+			String userId) throws Exception;
 }

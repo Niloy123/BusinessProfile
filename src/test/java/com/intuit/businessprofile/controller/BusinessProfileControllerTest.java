@@ -48,11 +48,12 @@ public class BusinessProfileControllerTest {
 	public void testAddBusinessProfile() throws Exception {
 		CreateBusinessProfileRequestDTO createBusinessProfileRequestDTO = random(CreateBusinessProfileRequestDTO.class);
 
-		when(businessProfileService.saveBusinessProfile(createBusinessProfileRequestDTO))
+		when(businessProfileService.saveBusinessProfile(createBusinessProfileRequestDTO, "1234"))
 				.thenReturn(random(BusinessProfile.class));
 
-		mvc.perform(post("/v1/businessprofile/createprofile").content(asJsonString(createBusinessProfileRequestDTO))
-				.contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
+		mvc.perform(post("/v1/businessprofile/createprofile/1234")
+				.content(asJsonString(createBusinessProfileRequestDTO)).contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isCreated());
 
 	}
 
@@ -60,13 +61,12 @@ public class BusinessProfileControllerTest {
 	public void testUpdateBusinessProfile() throws Exception {
 		UpdateBusinessProfileRequestDTO updateBusinessProfileRequestDTO = random(UpdateBusinessProfileRequestDTO.class);
 
-		when(businessProfileService.updateBusinessProfile(updateBusinessProfileRequestDTO))
+		when(businessProfileService.updateBusinessProfile(updateBusinessProfileRequestDTO, "1234"))
 				.thenReturn(random(BusinessProfile.class));
 
-		mvc.perform(
-				put("/v1/businessprofile/updateprofile").content(asJsonStringForUpdate(updateBusinessProfileRequestDTO))
-						.contentType(MediaType.APPLICATION_JSON))
-				.andExpect(status().isOk());
+		mvc.perform(put("/v1/businessprofile/updateprofile/1234")
+				.content(asJsonStringForUpdate(updateBusinessProfileRequestDTO))
+				.contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
 
 	}
 

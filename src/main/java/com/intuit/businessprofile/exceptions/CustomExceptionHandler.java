@@ -27,4 +27,12 @@ public class CustomExceptionHandler {
 		ErrorResponse error = new ErrorResponse("0002", errorMessage);
 		return new ResponseEntity(error, HttpStatus.BAD_REQUEST);
 	}
+
+	@ExceptionHandler(BadRequestException.class)
+	public final ResponseEntity<Object> handleBadRequestException(BadRequestException ex, WebRequest request) {
+		List<String> errorMessage = new ArrayList<>();
+		errorMessage.add(ex.getLocalizedMessage());
+		ErrorResponse error = new ErrorResponse("0003", errorMessage);
+		return new ResponseEntity(error, HttpStatus.BAD_REQUEST);
+	}
 }

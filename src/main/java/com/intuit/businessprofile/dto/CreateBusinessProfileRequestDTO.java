@@ -1,6 +1,5 @@
 package com.intuit.businessprofile.dto;
 
-import javax.persistence.Id;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 
@@ -12,9 +11,6 @@ import lombok.Data;
 @Data
 public class CreateBusinessProfileRequestDTO {
 
-	@Id
-	@NotBlank
-	private String userId;
 	@NotBlank
 	private String companyId;
 	@NotBlank

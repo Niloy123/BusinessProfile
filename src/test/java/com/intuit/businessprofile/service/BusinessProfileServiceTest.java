@@ -9,12 +9,14 @@ import static org.mockito.Mockito.when;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.Executor;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -33,7 +35,6 @@ import com.intuit.businessprofile.exceptions.ValidationException;
 import com.intuit.businessprofile.mappers.BusinessProfileMappers;
 import com.intuit.businessprofile.model.BusinessProfile;
 import com.intuit.businessprofile.model.UserSubscription;
-import com.intuit.businessprofile.repository.BusinessProfileCustomRepository;
 import com.intuit.businessprofile.repository.BusinessProfileRepository;
 import com.intuit.businessprofile.repository.UserSubscriptionRepository;
 
@@ -53,9 +54,6 @@ public class BusinessProfileServiceTest {
 	@MockBean
 	private UserSubscriptionRepository userSubscriptionRepository;
 
-	@MockBean
-	private BusinessProfileCustomRepository businessProfileCustomRepository;
-
 	private Map<Product, ProductClient> productClientMap;
 
 	@MockBean
@@ -70,38 +68,42 @@ public class BusinessProfileServiceTest {
 	@MockBean
 	private RestTemplate restTemplate;
 
+	// @MockBean
+	private ThreadPoolTaskExecutor executor;
+
 	@BeforeEach
 	public void setup() {
-//		qBAccountingClient = new QBAccountClient(restTemplate);
-//		qBPaymentsClient = new QBPaymentsClient(restTemplate);
-//		qBPayrollsClient = new QBPayrollClient(restTemplate);
-//		tSSheetsClient = new TSheetsClient(restTemplate);
 
 		productClientMap = new HashMap<>();
 		productClientMap.put(Product.QBAccounting, qBAccountingClient);
 		productClientMap.put(Product.QBPayments, qBPaymentsClient);
 		productClientMap.put(Product.QBPayroll, qBPayrollsClient);
 		productClientMap.put(Product.TSSheets, tSSheetsClient);
+		executor = new ThreadPoolTaskExecutor();
+		executor.setCorePoolSize(7);
+		executor.setMaxPoolSize(42);
+		executor.setQueueCapacity(11);
+		executor.setThreadNamePrefix("threadPoolExecutor-");
+		executor.initialize();
 
 		businessProfileService = new BusinessProfileServiceImpl(businessProfileRepository, businessProfileMappers,
-				userSubscriptionRepository, productClientMap, businessProfileCustomRepository);
+				userSubscriptionRepository, productClientMap, executor);
 
 	}
 
 	@Test
-	public void testSaveBusinessProfileSuccess() throws RecordNotFoundException, ValidationException {
+	public void testSaveBusinessProfileSuccess() throws Exception {
 
 		CreateBusinessProfileRequestDTO createBusinessProfileRequestDTO = random(CreateBusinessProfileRequestDTO.class);
 		UserSubscription userSubscription = random(UserSubscription.class);
-		userSubscription.setId(createBusinessProfileRequestDTO.getUserId());
+		userSubscription.setId("1234");
 		userSubscription.setIsQBAccount(true);
 		userSubscription.setIsQBPayments(true);
 		userSubscription.setIsQBPayroll(true);
 		userSubscription.setIsTSSheets(true);
 		BusinessProfile businessProfile = random(BusinessProfile.class);
 
-		when(userSubscriptionRepository.findById(createBusinessProfileRequestDTO.getUserId()))
-				.thenReturn(Optional.of(userSubscription));
+		when(userSubscriptionRepository.findById("1234")).thenReturn(Optional.of(userSubscription));
 
 		when(qBAccountingClient.validateProduct(createBusinessProfileRequestDTO)).thenReturn(true);
 		when(qBPaymentsClient.validateProduct(createBusinessProfileRequestDTO)).thenReturn(true);
@@ -110,12 +112,12 @@ public class BusinessProfileServiceTest {
 
 		when(businessProfileRepository.save(any())).thenReturn(businessProfile);
 
-		BusinessProfile actual = businessProfileService.saveBusinessProfile(createBusinessProfileRequestDTO);
+		BusinessProfile actual = businessProfileService.saveBusinessProfile(createBusinessProfileRequestDTO, "1234");
 		assertEquals(actual.getId(), businessProfile.getId());
 	}
 
 	@Test
-	public void testSaveBusinessProfileException() throws RecordNotFoundException, ValidationException {
+	public void testSaveBusinessProfileException() throws Exception {
 
 		CreateBusinessProfileRequestDTO createBusinessProfileRequestDTO = random(CreateBusinessProfileRequestDTO.class);
 		UserSubscription userSubscription = random(UserSubscription.class);
@@ -126,8 +128,7 @@ public class BusinessProfileServiceTest {
 		userSubscription.setIsTSSheets(true);
 		BusinessProfile businessProfile = random(BusinessProfile.class);
 
-		when(userSubscriptionRepository.findById(createBusinessProfileRequestDTO.getUserId()))
-				.thenReturn(Optional.ofNullable(null));
+		when(userSubscriptionRepository.findById("ffre")).thenReturn(Optional.ofNullable(null));
 
 		when(qBAccountingClient.validateProduct(createBusinessProfileRequestDTO)).thenReturn(true);
 		when(qBPaymentsClient.validateProduct(createBusinessProfileRequestDTO)).thenReturn(true);
@@ -137,23 +138,22 @@ public class BusinessProfileServiceTest {
 		when(businessProfileRepository.save(any())).thenReturn(businessProfile);
 
 		assertThrows(RecordNotFoundException.class,
-				() -> businessProfileService.saveBusinessProfile(createBusinessProfileRequestDTO));
+				() -> businessProfileService.saveBusinessProfile(createBusinessProfileRequestDTO, "ffreee"));
 	}
 
 	@Test
-	public void testUpdateBusinessProfileSuccess() throws RecordNotFoundException, ValidationException {
+	public void testUpdateBusinessProfileSuccess() throws Exception {
 
 		UpdateBusinessProfileRequestDTO updateBusinessProfileRequestDTO = random(UpdateBusinessProfileRequestDTO.class);
 		UserSubscription userSubscription = random(UserSubscription.class);
-		userSubscription.setId(updateBusinessProfileRequestDTO.getUserId());
+		userSubscription.setId("1234");
 		userSubscription.setIsQBAccount(true);
 		userSubscription.setIsQBPayments(true);
 		userSubscription.setIsQBPayroll(true);
 		userSubscription.setIsTSSheets(true);
 		BusinessProfile businessProfile = random(BusinessProfile.class);
 
-		when(userSubscriptionRepository.findById(updateBusinessProfileRequestDTO.getUserId()))
-				.thenReturn(Optional.of(userSubscription));
+		when(userSubscriptionRepository.findById("1234")).thenReturn(Optional.of(userSubscription));
 
 		when(qBAccountingClient.validateProductForUpdate(updateBusinessProfileRequestDTO)).thenReturn(true);
 		when(qBPaymentsClient.validateProductForUpdate(updateBusinessProfileRequestDTO)).thenReturn(true);
@@ -162,7 +162,7 @@ public class BusinessProfileServiceTest {
 
 		when(businessProfileRepository.save(any())).thenReturn(businessProfile);
 
-		BusinessProfile actual = businessProfileService.updateBusinessProfile(updateBusinessProfileRequestDTO);
+		BusinessProfile actual = businessProfileService.updateBusinessProfile(updateBusinessProfileRequestDTO, "1234");
 		assertEquals(actual.getId(), businessProfile.getId());
 	}
 
@@ -171,15 +171,14 @@ public class BusinessProfileServiceTest {
 
 		UpdateBusinessProfileRequestDTO updateBusinessProfileRequestDTO = random(UpdateBusinessProfileRequestDTO.class);
 		UserSubscription userSubscription = random(UserSubscription.class);
-		userSubscription.setId(updateBusinessProfileRequestDTO.getUserId());
+		userSubscription.setId("3456");
 		userSubscription.setIsQBAccount(true);
 		userSubscription.setIsQBPayments(true);
 		userSubscription.setIsQBPayroll(true);
 		userSubscription.setIsTSSheets(true);
 		BusinessProfile businessProfile = random(BusinessProfile.class);
 
-		when(userSubscriptionRepository.findById(updateBusinessProfileRequestDTO.getUserId()))
-				.thenReturn(Optional.ofNullable(null));
+		when(userSubscriptionRepository.findById("3456")).thenReturn(Optional.ofNullable(null));
 
 		when(qBAccountingClient.validateProductForUpdate(updateBusinessProfileRequestDTO)).thenReturn(true);
 		when(qBPaymentsClient.validateProductForUpdate(updateBusinessProfileRequestDTO)).thenReturn(true);
@@ -189,6 +188,6 @@ public class BusinessProfileServiceTest {
 		when(businessProfileRepository.save(any())).thenReturn(businessProfile);
 
 		assertThrows(RecordNotFoundException.class,
-				() -> businessProfileService.updateBusinessProfile(updateBusinessProfileRequestDTO));
+				() -> businessProfileService.updateBusinessProfile(updateBusinessProfileRequestDTO, "3456"));
 	}
 }

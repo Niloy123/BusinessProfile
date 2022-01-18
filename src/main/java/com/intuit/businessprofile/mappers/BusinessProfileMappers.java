@@ -1,6 +1,7 @@
 package com.intuit.businessprofile.mappers;
 
 import java.util.Objects;
+import java.util.UUID;
 
 import org.springframework.stereotype.Component;
 
@@ -15,9 +16,10 @@ import com.intuit.businessprofile.model.UserSubscription;
 @Component
 public class BusinessProfileMappers {
 
-	public BusinessProfile toBusinessProfile(CreateBusinessProfileRequestDTO createBusinessProfileRequestDTO) {
+	public BusinessProfile toBusinessProfile(CreateBusinessProfileRequestDTO createBusinessProfileRequestDTO,
+			String userId) {
 		BusinessProfile businessProfile = new BusinessProfile();
-		businessProfile.setId(createBusinessProfileRequestDTO.getUserId());
+		businessProfile.setId(userId);
 		businessProfile.setCompanyName(createBusinessProfileRequestDTO.getCompanyName());
 		businessProfile.setCompanyId(createBusinessProfileRequestDTO.getCompanyId());
 		businessProfile.setEmail(createBusinessProfileRequestDTO.getEmail());
@@ -46,7 +48,7 @@ public class BusinessProfileMappers {
 
 	public UserSubscription toUserSubscription(UserSubscriptionRequestDTO userSubscriptionRequestDTO) {
 		UserSubscription userSubscription = new UserSubscription();
-		userSubscription.setId(userSubscriptionRequestDTO.getUserId());
+		userSubscription.setId(UUID.randomUUID().toString());
 		userSubscription.setIsQBAccount(userSubscriptionRequestDTO.getIsQBAccount());
 		userSubscription.setIsQBPayments(userSubscriptionRequestDTO.getIsQBPayments());
 		userSubscription.setIsQBPayroll(userSubscriptionRequestDTO.getIsQBPayroll());
