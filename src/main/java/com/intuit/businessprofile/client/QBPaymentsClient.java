@@ -3,8 +3,10 @@ package com.intuit.businessprofile.client;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -35,8 +37,13 @@ public class QBPaymentsClient implements ProductClient {
 		UriComponents uri = UriComponentsBuilder.fromUriString(Constants.VALIDATION_URL_BASE)
 				.path(Constants.VALIDATION_QB_PAYMENTS_URL_PATH).build();
 		HttpEntity<CreateBusinessProfileRequestDTO> requestEntity = new HttpEntity<>(createBusinessProfileRequestDTO);
-		ResponseEntity<DummyValidatorResponse> responseEntity = restTemplate.exchange(uri.toString(), HttpMethod.POST,
-				requestEntity, DummyValidatorResponse.class);
+		ResponseEntity<DummyValidatorResponse> responseEntity;
+		try {
+			responseEntity = restTemplate.exchange(uri.toString(), HttpMethod.POST, requestEntity,
+					DummyValidatorResponse.class);
+		} catch (HttpClientErrorException e) {
+			throw new HttpClientErrorException(HttpStatus.BAD_GATEWAY);
+		}
 		return responseEntity.getBody().isSuccess();
 	}
 

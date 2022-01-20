@@ -28,6 +28,7 @@ import com.intuit.businessprofile.client.QBPaymentsClient;
 import com.intuit.businessprofile.client.QBPayrollClient;
 import com.intuit.businessprofile.client.TSheetsClient;
 import com.intuit.businessprofile.dto.CreateBusinessProfileRequestDTO;
+import com.intuit.businessprofile.dto.GetBusinessProfileDTO;
 import com.intuit.businessprofile.dto.UpdateBusinessProfileRequestDTO;
 import com.intuit.businessprofile.enums.Product;
 import com.intuit.businessprofile.exceptions.RecordNotFoundException;
@@ -152,8 +153,10 @@ public class BusinessProfileServiceTest {
 		userSubscription.setIsQBPayroll(true);
 		userSubscription.setIsTSSheets(true);
 		BusinessProfile businessProfile = random(BusinessProfile.class);
+		businessProfile.setId("1234");
 
 		when(userSubscriptionRepository.findById("1234")).thenReturn(Optional.of(userSubscription));
+		when(businessProfileRepository.findById("1234")).thenReturn(Optional.of(businessProfile));
 
 		when(qBAccountingClient.validateProductForUpdate(updateBusinessProfileRequestDTO)).thenReturn(true);
 		when(qBPaymentsClient.validateProductForUpdate(updateBusinessProfileRequestDTO)).thenReturn(true);
@@ -189,5 +192,15 @@ public class BusinessProfileServiceTest {
 
 		assertThrows(RecordNotFoundException.class,
 				() -> businessProfileService.updateBusinessProfile(updateBusinessProfileRequestDTO, "3456"));
+	}
+
+	@Test
+	public void testGetBusinessProfile() throws Exception {
+		BusinessProfile businessProfile = random(BusinessProfile.class);
+		businessProfile.setId("1234");
+		when(businessProfileRepository.findById("1234")).thenReturn(Optional.of(businessProfile));
+		GetBusinessProfileDTO getBusinessProfileDTO = businessProfileService.getProfile("1234");
+		assertEquals(getBusinessProfileDTO.getUserId(), businessProfile.getId());
+		assertEquals(getBusinessProfileDTO.getCompanyId(), businessProfile.getCompanyId());
 	}
 }

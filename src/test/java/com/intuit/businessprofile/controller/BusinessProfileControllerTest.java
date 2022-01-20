@@ -2,6 +2,7 @@ package com.intuit.businessprofile.controller;
 
 import static io.github.benas.randombeans.api.EnhancedRandom.random;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -20,6 +21,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intuit.businessprofile.dto.CreateBusinessProfileRequestDTO;
+import com.intuit.businessprofile.dto.GetBusinessProfileDTO;
 import com.intuit.businessprofile.dto.UpdateBusinessProfileRequestDTO;
 import com.intuit.businessprofile.exceptions.CustomExceptionHandler;
 import com.intuit.businessprofile.model.BusinessProfile;
@@ -67,6 +69,24 @@ public class BusinessProfileControllerTest {
 		mvc.perform(put("/v1/businessprofile/updateprofile/1234")
 				.content(asJsonStringForUpdate(updateBusinessProfileRequestDTO))
 				.contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
+
+	}
+
+	@Test
+	public void testGetBusinessProfile() throws Exception {
+
+		when(businessProfileService.getProfile("1234")).thenReturn(random(GetBusinessProfileDTO.class));
+		mvc.perform(get("/v1/businessprofile/getprofile/1234").contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk());
+
+	}
+
+	@Test
+	public void testGetBusinessProfileNotFound() throws Exception {
+
+		when(businessProfileService.getProfile("1234")).thenReturn(random(GetBusinessProfileDTO.class));
+		mvc.perform(get("/v1/businessprofile/getpro/1234").contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isNotFound());
 
 	}
 

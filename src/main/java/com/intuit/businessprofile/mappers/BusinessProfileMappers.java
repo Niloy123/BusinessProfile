@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Component;
 
 import com.intuit.businessprofile.dto.CreateBusinessProfileRequestDTO;
+import com.intuit.businessprofile.dto.GetBusinessProfileDTO;
 import com.intuit.businessprofile.dto.UpdateBusinessProfileRequestDTO;
 import com.intuit.businessprofile.dto.UserSubscriptionRequestDTO;
 import com.intuit.businessprofile.model.BusinessAddress;
@@ -111,5 +112,35 @@ public class BusinessProfileMappers {
 			}
 		}
 		return businessProfile;
+	}
+
+	public GetBusinessProfileDTO toBusinessProfileDTO(String userId, BusinessProfile businessProfile) {
+		// TODO Auto-generated method stub
+		GetBusinessProfileDTO getBusinessProfileDTO = new GetBusinessProfileDTO();
+		getBusinessProfileDTO.setCompanyId(businessProfile.getCompanyId());
+		getBusinessProfileDTO.setCompanyName(businessProfile.getCompanyName());
+		getBusinessProfileDTO.setEmail(businessProfile.getEmail());
+		getBusinessProfileDTO.setUserId(userId);
+		getBusinessProfileDTO.setWebsite(businessProfile.getWebsite());
+		TaxIdentifiers taxIdentifiers = new TaxIdentifiers();
+		if (businessProfile.getTaxIdentifiers() != null) {
+			taxIdentifiers.setEin(businessProfile.getTaxIdentifiers().getEin());
+			taxIdentifiers.setPan(businessProfile.getTaxIdentifiers().getPan());
+		}
+		getBusinessProfileDTO.setTaxIdentifiers(taxIdentifiers);
+		BusinessAddress businessAddress = new BusinessAddress();
+		if (businessProfile.getBusinessAddress() != null) {
+			businessAddress.setCity(businessProfile.getBusinessAddress().getCity());
+			businessAddress.setCountry(businessProfile.getBusinessAddress().getCountry());
+			businessAddress.setLine1(businessProfile.getBusinessAddress().getLine1());
+			businessAddress.setLine2(businessProfile.getBusinessAddress().getLine2());
+			businessAddress.setState(businessProfile.getBusinessAddress().getState());
+			businessAddress.setZip(businessProfile.getBusinessAddress().getZip());
+		}
+		getBusinessProfileDTO.setBusinessAddress(businessAddress);
+		getBusinessProfileDTO.setLegalAddress(businessProfile.getLegalAddress());
+		getBusinessProfileDTO.setLegalName(businessProfile.getLegalName());
+
+		return getBusinessProfileDTO;
 	}
 }

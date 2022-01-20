@@ -6,9 +6,9 @@ import com.intuit.businessprofile.enums.Product;
 
 public interface ProductClient {
 
-	boolean validateProduct(CreateBusinessProfileRequestDTO createBusinessProfileRequestDTO);
+	boolean validateProduct(CreateBusinessProfileRequestDTO createBusinessProfileRequestDTO) throws Exception;
 
-	boolean validateProductForUpdate(UpdateBusinessProfileRequestDTO updateBusinessProfileRequestDTO);
+	boolean validateProductForUpdate(UpdateBusinessProfileRequestDTO updateBusinessProfileRequestDTO) throws Exception;
 
 	Product getProduct();
 }

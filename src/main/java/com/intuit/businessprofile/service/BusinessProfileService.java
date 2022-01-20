@@ -1,9 +1,8 @@
 package com.intuit.businessprofile.service;
 
 import com.intuit.businessprofile.dto.CreateBusinessProfileRequestDTO;
+import com.intuit.businessprofile.dto.GetBusinessProfileDTO;
 import com.intuit.businessprofile.dto.UpdateBusinessProfileRequestDTO;
-import com.intuit.businessprofile.exceptions.RecordNotFoundException;
-import com.intuit.businessprofile.exceptions.ValidationException;
 import com.intuit.businessprofile.model.BusinessProfile;
 
 public interface BusinessProfileService {
@@ -13,4 +12,6 @@ public interface BusinessProfileService {
 
 	BusinessProfile updateBusinessProfile(UpdateBusinessProfileRequestDTO updateBusinessProfileRequestDTO,
 			String userId) throws Exception;
+
+	GetBusinessProfileDTO getProfile(String userId) throws Exception;
 }

@@ -16,4 +16,9 @@ public class Constants {
 	public static final String VALIDATION_UPDATE_QB_PAYROLLS_URL_PATH = "/v1/dummyvalidation/validateUpdateQBPayroll";
 	public static final String VALIDATION_UPDATE_TSSHEETS_URL_PATH = "/v1/dummyvalidation/validateUpdateTSSheets";
 
+	// ErrorCodes
+	public static final String USER_NOT_FOUND_ERROR_CODE = "0001";
+	public static final String BAD_REQUEST_ERROR_CODE = "0003";
+	public static final String VALIDATION_FAILED_ERROR_CODE = "0002";
+
 }

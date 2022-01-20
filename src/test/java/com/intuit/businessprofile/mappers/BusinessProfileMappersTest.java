@@ -10,6 +10,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import com.intuit.businessprofile.dto.GetBusinessProfileDTO;
 import com.intuit.businessprofile.dto.UpdateBusinessProfileRequestDTO;
 import com.intuit.businessprofile.model.BusinessProfile;
 
@@ -23,6 +24,16 @@ public class BusinessProfileMappersTest {
 	@BeforeEach
 	public void setup() {
 		businessProfileMappers = new BusinessProfileMappers();
+	}
+
+	@Test
+	public void testToBusinessProfileDTO() {
+		BusinessProfile businessProfile = random(BusinessProfile.class);
+		businessProfile.setId("1234");
+		GetBusinessProfileDTO getBusinessProfileDTO = businessProfileMappers.toBusinessProfileDTO("1234",
+				businessProfile);
+		assertEquals(getBusinessProfileDTO.getCompanyId(), businessProfile.getCompanyId());
+		assertEquals(getBusinessProfileDTO.getUserId(), businessProfile.getId());
 	}
 
 	@Test

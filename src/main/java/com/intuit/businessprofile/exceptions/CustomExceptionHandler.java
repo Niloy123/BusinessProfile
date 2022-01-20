@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 
+import com.intuit.businessprofile.constants.Constants;
+
 @RestControllerAdvice
 public class CustomExceptionHandler {
 
@@ -16,7 +18,7 @@ public class CustomExceptionHandler {
 	public final ResponseEntity<Object> handleUserNotFoundException(RecordNotFoundException ex, WebRequest request) {
 		List<String> errorMessage = new ArrayList<>();
 		errorMessage.add(ex.getLocalizedMessage());
-		ErrorResponse error = new ErrorResponse("0001", errorMessage);
+		ErrorResponse error = new ErrorResponse(Constants.USER_NOT_FOUND_ERROR_CODE, errorMessage);
 		return new ResponseEntity(error, HttpStatus.NOT_FOUND);
 	}
 
@@ -24,7 +26,7 @@ public class CustomExceptionHandler {
 	public final ResponseEntity<Object> handleValidationException(ValidationException ex, WebRequest request) {
 		List<String> errorMessage = new ArrayList<>();
 		errorMessage.add(ex.getLocalizedMessage());
-		ErrorResponse error = new ErrorResponse("0002", errorMessage);
+		ErrorResponse error = new ErrorResponse(Constants.VALIDATION_FAILED_ERROR_CODE, errorMessage);
 		return new ResponseEntity(error, HttpStatus.BAD_REQUEST);
 	}
 
@@ -32,7 +34,7 @@ public class CustomExceptionHandler {
 	public final ResponseEntity<Object> handleBadRequestException(BadRequestException ex, WebRequest request) {
 		List<String> errorMessage = new ArrayList<>();
 		errorMessage.add(ex.getLocalizedMessage());
-		ErrorResponse error = new ErrorResponse("0003", errorMessage);
+		ErrorResponse error = new ErrorResponse(Constants.BAD_REQUEST_ERROR_CODE, errorMessage);
 		return new ResponseEntity(error, HttpStatus.BAD_REQUEST);
 	}
 }

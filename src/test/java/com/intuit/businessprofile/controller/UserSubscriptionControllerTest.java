@@ -2,6 +2,7 @@ package com.intuit.businessprofile.controller;
 
 import static io.github.benas.randombeans.api.EnhancedRandom.random;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -18,6 +19,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.intuit.businessprofile.dto.GetSubscriptionDTO;
 import com.intuit.businessprofile.dto.UserSubscriptionRequestDTO;
 import com.intuit.businessprofile.model.UserSubscription;
 import com.intuit.businessprofile.service.UserSubscriptionService;
@@ -40,7 +42,7 @@ public class UserSubscriptionControllerTest {
 	}
 
 	@Test
-	public void testAddBusinessProfile() throws Exception {
+	public void testAddSubscription() throws Exception {
 		UserSubscriptionRequestDTO userSubscriptionRequestDTO = random(UserSubscriptionRequestDTO.class);
 
 		when(userSubscriptionService.saveUserScription(userSubscriptionRequestDTO))
@@ -48,6 +50,16 @@ public class UserSubscriptionControllerTest {
 
 		mvc.perform(post("/v1/usersubscription/addSubscription").content(asJsonString(userSubscriptionRequestDTO))
 				.contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
+
+	}
+
+	@Test
+	public void testGetSubscription() throws Exception {
+
+		GetSubscriptionDTO getSubscriptionDTO = random(GetSubscriptionDTO.class);
+		when(userSubscriptionService.getSubscription("1234")).thenReturn(getSubscriptionDTO);
+
+		mvc.perform(get("/v1/usersubscription/getSubscription/1234")).andExpect(status().isOk());
 
 	}
 
